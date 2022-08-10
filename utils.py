@@ -88,9 +88,9 @@ def risk_gauge(risk, segment=False):
         gauge={'axis': {'range':[0,100]},
                'bar':{'color':'#4D96FF', 'thickness':0.17},
                'steps':[
-                    {'range':[0,33.33], 'color':'#FF6B6B'},
+                    {'range':[0,33.33], 'color':'#6BCB77'},
                     {'range':[33.33,66.66], 'color':'#FFD93D'},
-                    {'range':[66.66,100], 'color':'#6BCB77'}
+                    {'range':[66.66,100], 'color':'#FF6B6B'}
               ]
               }
     ))
