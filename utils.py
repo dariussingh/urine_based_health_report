@@ -5,6 +5,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pickle
 from datetime import datetime, timedelta
+import matplotlib.pyplot as plt
+import matplotlib as mpl
+
 
 
 def find_age(dob):
@@ -108,10 +111,10 @@ def water_ph_plot(time_list, ph_list, water_list):
     fig.add_trace(go.Scatter(x=time_list, y=ph_list, 
                              mode='lines+markers', name='Urine pH level',
                              marker={'color':'#FFA500'}), secondary_y=False)
-    fig.add_trace(go.Scatter(x=time_list, y=[8 for i in range(10)], mode='lines',
+    fig.add_trace(go.Scatter(x=time_list, y=[8 for i in range(24)], mode='lines',
                             line={'dash':'dash', 'color':'blue'},
                             name='Upper healthy pH limit (Alkaline)'))
-    fig.add_trace(go.Scatter(x=time_list, y=[4.5 for i in range(10)], mode='lines',
+    fig.add_trace(go.Scatter(x=time_list, y=[4.5 for i in range(24)], mode='lines',
                             line={'dash':'dash', 'color':'red'},
                             name='Lower healthy pH limit (Acidic)'))
 
@@ -126,28 +129,32 @@ def water_ph_plot(time_list, ph_list, water_list):
     return fig
 
 
-def ph_info(last_time_water, number_of_glasses):
+def ph_info(water_dict):
     time_list = []
-    ph_list = []
-    water_list = []
+    ph_list = [7 for i in range(24)]
+    water_list = [0 for i in range(24)]
     
-    time = last_time_water
-    ph = 7
+    time = min(water_dict.keys())
+    time = datetime(100, 1, 1, time.hour, time.minute, time.second)
+    time -= timedelta(hours=1)
+    time = time.time()
     
-    for i in range(10):
+    for i in range(24):
         time_list.append(time)
-        ph_list.append(ph)
-        
-        ph -= 0.5
+        last_time = time
         time = datetime(100, 1, 1, time.hour, time.minute, time.second)
         time += timedelta(hours=1)
         time = time.time()
         
-        if i==0:
-            water_list.append(number_of_glasses)
-        else:
-            water_list.append(0)
-            
+        ph_list = ph_list[:i] + [j-0.25 for j in ph_list[i:]]
+        
+        for key in water_dict.keys():
+            if last_time<=key<time:
+                last_time = key
+                time_list[i] = key
+                water_list[i] = water_dict[key]
+                ph_list[i:] = [7 for k in range(len(ph_list[i:]))]
+        
     return time_list, ph_list, water_list
 
 
