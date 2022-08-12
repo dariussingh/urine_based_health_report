@@ -51,17 +51,20 @@ if st.button('Submit'):
     col1, col2 = st.columns((1,1))
 
     col1.plotly_chart(utils.risk_gauge(risk), use_container_width=True)
+
     col2.plotly_chart(utils.risk_gauge(segment_risk, segment=True), use_container_width=True)
 
     st.markdown('---')
     # ---------------------------------------------------------------
 
     col1, col2 = st.columns((2,1))
+    
     time_list, ph_list, water_list = utils.ph_info(water_dict)
     col1.markdown('## Urine pH Chart')
     col1.plotly_chart(utils.water_ph_plot(time_list, ph_list, water_list), use_container_width=True)
+    
     col2.markdown(f"""
-    ## Recommendation:
+    ## Recommendation
     The colour of your urine is {urine_color} and its pH is {urine_ph}.
     {utils.color_based_recommendation(urine_color)}
     """)
@@ -69,11 +72,18 @@ if st.button('Submit'):
 
     st.markdown('---')
     # ---------------------------------------------------------------
+
     col1, col2 = st.columns((2,1))
+    
     col1.markdown(f"""
-    ## Lifestyle Recommendation
+    ## Lifestyle Improvement Tips
     {utils.ph_based_recommendation(urine_ph)}
     """)
+    col1.markdown("""
+    ## More Information
+    For more information and to learn how you can adopt a healthier life style visit [The Tann Mann Gaadi](https://www.thetannmanngaadi.org/).
+    """)
+    
     col2.markdown('## Urine pH Scale')
     col2.pyplot(utils.ph_chart(urine_ph))
     if 4.5<urine_ph<8:
@@ -83,5 +93,7 @@ if st.button('Submit'):
         col2.markdown('__Please consult a doctor immediately.__')
 
     st.markdown('---')
+    # ---------------------------------------------------------------
+
 
     

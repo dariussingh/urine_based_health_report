@@ -191,7 +191,7 @@ def ph_based_recommendation(urine_ph):
     elif 7.25<=urine_ph<8:
         rec = "WHile not uncommon, this is not healthy."
     else:
-        rec = 'Something is severely wrong. Your body is dangerously alkaline; please see a doctor right away.'
+        rec = 'Something is severely wrong. Your body is dangerously alkaline, please see a doctor right away.'
         
     return rec
 
@@ -215,7 +215,7 @@ def ph_chart(urine_ph):
                                     ticks=bounds,
                                     orientation='vertical')
     
-    ax.annotate("Your Urine pH", xy=(0, urine_ph), xytext=(-2, urine_ph),
+    ax.annotate("Your urine pH", xy=(0, urine_ph), xytext=(-2, urine_ph),
             arrowprops=dict(arrowstyle="->"))
     ax.annotate("Upper healthy pH limit", xy=(0, 8), xytext=(-3, 8),
             arrowprops=dict(arrowstyle="->"), c='b')
