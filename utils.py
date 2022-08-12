@@ -4,9 +4,11 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import pickle
+import datetime as dt
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib as mpl
+import statistics
 
 
 
@@ -111,10 +113,10 @@ def water_ph_plot(time_list, ph_list, water_list):
     fig.add_trace(go.Scatter(x=time_list, y=ph_list, 
                              mode='lines+markers', name='Urine pH level',
                              marker={'color':'#FFA500'}), secondary_y=False)
-    fig.add_trace(go.Scatter(x=time_list, y=[8 for i in range(24)], mode='lines',
+    fig.add_trace(go.Scatter(x=time_list, y=[8 for i in range(len(time_list))], mode='lines',
                             line={'dash':'dash', 'color':'blue'},
                             name='Upper healthy pH limit (Alkaline)'))
-    fig.add_trace(go.Scatter(x=time_list, y=[4.5 for i in range(24)], mode='lines',
+    fig.add_trace(go.Scatter(x=time_list, y=[4.5 for i in range(len(time_list))], mode='lines',
                             line={'dash':'dash', 'color':'red'},
                             name='Lower healthy pH limit (Acidic)'))
 
@@ -129,33 +131,50 @@ def water_ph_plot(time_list, ph_list, water_list):
     return fig
 
 
-def ph_info(water_dict):
+
+
+def ph_info(water_dict, urine_ph_dict):
     time_list = []
-    ph_list = [7 for i in range(24)]
-    water_list = [0 for i in range(24)]
-    
-    time = min(water_dict.keys())
-    time = datetime(100, 1, 1, time.hour, time.minute, time.second)
-    time -= timedelta(hours=1)
-    time = time.time()
-    
+    ph_list = []
+    water_list = []
+    time_ = dt.time(0,0)
+
     for i in range(24):
-        time_list.append(time)
-        last_time = time
-        time = datetime(100, 1, 1, time.hour, time.minute, time.second)
-        time += timedelta(hours=1)
-        time = time.time()
+        time_list.append(time_)
+        time_ = datetime(100, 1, 1, time_.hour, time_.minute, time_.second)
+        time_ += timedelta(hours=1)
+        time_ = time_.time()
+    
+    time_list = time_list + list(water_dict.keys()) + list(urine_ph_dict.keys())
+    time_list = list(set(time_list))
+    time_list = sorted(time_list)
+
+    
+    ph = 7
+    
+    for key in time_list:
+        # check urine_ph_dict
+        if key in urine_ph_dict:
+            ph = urine_ph_dict[key]
+        else:
+            ph -= 0.25
+        # check water_dict
+        if key in water_dict.keys():
+            water = water_dict[key]
+            if ph+water<=7.25:
+                ph += water
+            else:
+                ph = 7
+        else:
+            water = 0
         
-        ph_list = ph_list[:i] + [j-0.25 for j in ph_list[i:]]
+        ph_list.append(ph)
+        water_list.append(water)
         
-        for key in water_dict.keys():
-            if last_time<=key<time:
-                last_time = key
-                time_list[i] = key
-                water_list[i] = water_dict[key]
-                ph_list[i:] = [7 for k in range(len(ph_list[i:]))]
-        
+    
     return time_list, ph_list, water_list
+
+
 
 
 def color_based_recommendation(urine_color):
@@ -179,9 +198,9 @@ def color_based_recommendation(urine_color):
 
 def ph_based_recommendation(urine_ph):
     if 0<=urine_ph<4.5:
-        rec = "Something is severely wrong. Your body is dangerously acidic; please see a doctor right away."
+        rec = "Something is severely wrong. Your body is dangerously acidic, please see a doctor right away."
     elif 4.5<=urine_ph<6:
-        rec = "This is a danger zone; your body is too acidic; drastic dietary and lifestyle changes are advised. Please see a doctor."
+        rec = "This is a danger zone, your body is too acidic, drastic dietary and lifestyle changes are advised. Please see a doctor."
     elif 6<=urine_ph<6.5:
         rec = 'Consider dietary and lifestyle changes to improve the pH of your body.'
     elif 6.5<=urine_ph<6.7:
@@ -215,7 +234,7 @@ def ph_chart(urine_ph):
                                     ticks=bounds,
                                     orientation='vertical')
     
-    ax.annotate("Your urine pH", xy=(0, urine_ph), xytext=(-2, urine_ph),
+    ax.annotate("Your average urine pH", xy=(0, urine_ph), xytext=(-3, urine_ph),
             arrowprops=dict(arrowstyle="->"))
     ax.annotate("Upper healthy pH limit", xy=(0, 8), xytext=(-3, 8),
             arrowprops=dict(arrowstyle="->"), c='b')
@@ -226,3 +245,14 @@ def ph_chart(urine_ph):
     
     
     return fig
+
+
+def avg_ph(ph_list):
+    n = len(ph_list)
+    avg = sum(ph_list) / n
+    return avg
+
+
+def avg_color(color_list):
+    avg = statistics.mode(color_list)
+    return avg

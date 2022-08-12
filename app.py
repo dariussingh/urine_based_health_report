@@ -1,6 +1,8 @@
 import utils
 import streamlit as st
-from datetime import datetime, time
+import datetime as dt
+from datetime import datetime
+
 
 
 # Set config
@@ -22,21 +24,36 @@ st.markdown('---')
 # ---------------------------------------------------------------
 
 st.header("How much water did your drink today")
-water_drinking_ocassions = st.slider('Number of water drinking ocassions today', 1, 4, value=2)
+water_drinking_ocassions = st.slider('Number of water drinking ocassions today', 1, 10, value=5)
     
-col1, col2 = st.columns((1,1))
 water_dict = dict()
 
 for i in range(water_drinking_ocassions):
-    time_ = col1.time_input('Time', key=str(i), value=time((i+1)**2,0))
+    col1, col2 = st.columns((1,1))
+    time_ = col1.time_input('Time', key=str(i), value=dt.time(i+2,0))
     num_glasses = col2.slider('Number of glasses of water you drank last', min_value=1, max_value=5, value=2, key=str(10+i))
     water_dict[time_] = num_glasses
+    st.markdown("")
 st.markdown('---')  
 # ---------------------------------------------------------------
 
 st.header('Urine Details')
-urine_color = st.selectbox('Urine Colour', ['Clear', 'Pale Yellow', 'Yellow', 'Dark Yellow', 'Honey', 'Brown'])
-urine_ph = st.slider('Urine pH', min_value=1.0, max_value=14.0, value=7.0, step=0.25)
+urine_passing_ocassions = st.slider('Number of urine passing ocassions today', 1, 10, value=5)
+
+urine_ph_dict = dict()
+urine_color_dict = dict()
+
+for i in range(urine_passing_ocassions):
+    col1, col2, col3 = st.columns((1,1,1))
+    time_ = col1.time_input('Time', key='9'+str(i), value=dt.time(i+2,0))
+    urine_color = col2.selectbox('Urine Colour', ['Clear', 'Pale Yellow', 'Yellow', 'Dark Yellow', 'Honey', 'Brown'], key='8'+str(i))
+    urine_ph = col3.slider('Urine pH', min_value=1.0, max_value=14.0, value=7.0, step=0.25, key='7'+str(i))
+    urine_ph_dict[time_] = urine_ph
+    urine_color_dict[time_] = urine_color
+    st.markdown("")
+
+urine_ph = utils.avg_ph(list(urine_ph_dict.values()))
+urine_color = utils.avg_color(list(urine_color_dict.values()))
 st.markdown('---')
 # ---------------------------------------------------------------
 
@@ -59,13 +76,13 @@ if st.button('Submit'):
 
     col1, col2 = st.columns((2,1))
     
-    time_list, ph_list, water_list = utils.ph_info(water_dict)
+    time_list, ph_list, water_list = utils.ph_info(water_dict, urine_ph_dict)
     col1.markdown('## Urine pH Chart')
     col1.plotly_chart(utils.water_ph_plot(time_list, ph_list, water_list), use_container_width=True)
     
     col2.markdown(f"""
     ## Recommendation
-    The colour of your urine is {urine_color} and its pH is {urine_ph}.
+    The general colour of your urine is {urine_color} and its average pH is {urine_ph}.
     {utils.color_based_recommendation(urine_color)}
     """)
     col2.markdown('It is advised that you drink water and rehydrate before the pH of your urine crosses the upper or lower limit of pH.')
