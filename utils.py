@@ -158,7 +158,7 @@ def ph_info(water_dict):
     return time_list, ph_list, water_list
 
 
-def recommendation(urine_color):
+def color_based_recommendation(urine_color):
     if urine_color == 'Clear':
         rec = "Doing Great! You are well hydrated."
     elif urine_color == 'Pale Yellow':
@@ -175,3 +175,54 @@ def recommendation(urine_color):
         rec = 'Please consult a docter.'
         
     return rec
+
+
+def ph_based_recommendation(urine_ph):
+    if 0<=urine_ph<4.5:
+        rec = "Something is severely wrong. Your body is dangerously acidic; please see a doctor right away."
+    elif 4.5<=urine_ph<6:
+        rec = "This is a danger zone; your body is too acidic; drastic dietary and lifestyle changes are advised. Please see a doctor."
+    elif 6<=urine_ph<6.5:
+        rec = 'Consider dietary and lifestyle changes to improve the pH of your body.'
+    elif 6.5<=urine_ph<6.7:
+        rec = "Consider slight dietary adjustments to bring your pH back up to where it should be."
+    elif 6.7<=urine_ph<7.25:
+        rec = 'Congratulations! Keep up the good work by maintaining an alkalising lifestyle.'
+    elif 7.25<=urine_ph<8:
+        rec = "WHile not uncommon, this is not healthy."
+    else:
+        rec = 'Something is severely wrong. Your body is dangerously alkaline; please see a doctor right away.'
+        
+    return rec
+
+
+def ph_chart(urine_ph):
+    fig, ax = plt.subplots(figsize=(1, 6))
+    fig.suptitle('Urine pH Scale')
+
+    cmap = mpl.colors.ListedColormap(['#fe1321', '#fe531a', '#ffa400', 
+                                      '#ffcc01', '#dbe000', '#6ed700', 
+                                      '#00b601', '#038503', '#00a654', 
+                                      '#00c1b9', '#008bca', '#014bca', 
+                                      '#3421b9', '#480da7', '#3e0890'])
+
+    bounds = [i for i in range(15)]
+    norm = mpl.colors.BoundaryNorm(bounds, cmap.N)
+
+    cbar = mpl.colorbar.ColorbarBase(ax, cmap=cmap,
+                                    boundaries=bounds,
+                                    norm=norm,
+                                    ticks=bounds,
+                                    orientation='vertical')
+    
+    ax.annotate("Your Urine pH", xy=(0, urine_ph), xytext=(-2, urine_ph),
+            arrowprops=dict(arrowstyle="->"))
+    ax.annotate("Upper healthy pH limit", xy=(0, 8), xytext=(-3, 8),
+            arrowprops=dict(arrowstyle="->"), c='b')
+    ax.annotate("Lower healthy pH limit", xy=(0, 4.5), xytext=(-3, 4.5),
+            arrowprops=dict(arrowstyle="->"), c='r')
+
+    cbar.ax.set_yticklabels(['acidic']+[str(i) for i in range(1,14)]+['alkaline'])
+    
+    
+    return fig
