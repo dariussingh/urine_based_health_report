@@ -216,6 +216,31 @@ def ph_based_recommendation(urine_ph):
     return rec
 
 
+def drink_water_recommendation(time_list, ph_list, water_list):
+    rehydrate_time = []
+    for i in range(len(time_list)):
+        ph = ph_list[i]
+        time = time_list[i]
+        water = water_list[i]
+
+        if water!=0:
+            rehydrate_time = []
+            last_water = time
+            
+        if ph<=4.5 or ph>=8:
+            rehydrate_time.append(time)
+        else:
+            pass
+        
+    if rehydrate_time == []:
+        last_water = datetime(100, 1, 1, last_water.hour, last_water.minute, last_water.second)
+        last_water += timedelta(hours=3)
+        last_water = last_water.time()
+        rehydrate_time = [last_water]
+        
+    return rehydrate_time
+
+
 def ph_chart(urine_ph):
     fig, ax = plt.subplots(figsize=(1, 6))
     fig.suptitle('Urine pH Scale')

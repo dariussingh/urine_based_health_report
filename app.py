@@ -85,7 +85,7 @@ if st.button('Submit'):
     The general colour of your urine is {urine_color} and its average pH is {urine_ph}.
     {utils.color_based_recommendation(urine_color)}
     """)
-    col2.markdown('It is advised that you drink water and rehydrate before the pH of your urine crosses the upper or lower limit of pH.')
+    col2.markdown(f"__It is advised that you drink water and rehydrate before {utils.drink_water_recommendation(time_list, ph_list, water_list)[0].strftime('%I:%M %p')}.__")
 
     st.markdown('---')
     # ---------------------------------------------------------------
