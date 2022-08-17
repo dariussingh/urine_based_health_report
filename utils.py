@@ -240,14 +240,14 @@ def drink_water_recommendation(time_list, ph_list, water_list):
         rehydrate_time = [last_water]
         rec_time = rehydrate_time[0].strftime('%I:%M %p')
         rec =f"It is advised that you drink water and rehydrate before {rec_time}."
-    elif rehydrate_time[0]==last_water and len(rehydrate_time)==1:
+    elif rehydrate_time[0]==last_water:
         rec_time = last_water.strftime('%I:%M %p')
         rec = f"You did not drink enough water the last time drank water (at {rec_time}), it is advised you drink more water immediately."
     else:
         rec_time = rehydrate_time[0].strftime('%I:%M %p')
         rec =f"It is advised that you drink water and rehydrate before {rec_time}."
 
-    return rec 
+    return rec
 
 
 def extreme_case_based_recommendation(time_list, ph_list):
