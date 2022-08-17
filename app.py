@@ -85,7 +85,7 @@ if st.button('Submit'):
     The general colour of your urine is {urine_color} and its average pH is {urine_ph}.
     {utils.color_based_recommendation(urine_color)}
     """)
-    col2.markdown(f"__It is advised that you drink water and rehydrate before {utils.drink_water_recommendation(time_list, ph_list, water_list)[0].strftime('%I:%M %p')}.__")
+    col2.markdown(f"__{utils.drink_water_recommendation(time_list, ph_list, water_list)}__")
 
     st.markdown('---')
     # ---------------------------------------------------------------
@@ -95,6 +95,9 @@ if st.button('Submit'):
     col1.markdown(f"""
     ## Lifestyle Improvement Tips
     {utils.ph_based_recommendation(urine_ph)}
+    """)
+    col1.markdown(f"""
+    {utils.extreme_case_based_recommendation(time_list, ph_list)}
     """)
     col1.markdown("""
     ## More Information

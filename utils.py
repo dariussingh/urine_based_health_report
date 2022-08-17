@@ -158,7 +158,8 @@ def ph_info(water_dict, urine_ph_dict):
         if key in urine_ph_dict:
             ph = urine_ph_dict[key]
         else:
-            ph -= 0.25
+            if 1.5<=ph<=13.5:
+                ph -= 0.25
         # check water_dict
         if key in water_dict.keys():
             water = water_dict[key]
@@ -200,13 +201,13 @@ def color_based_recommendation(urine_color):
 def ph_based_recommendation(urine_ph):
     if 0<=urine_ph<4.5:
         rec = "Something is severely wrong. Your body is dangerously acidic, please see a doctor right away."
-    elif 4.5<=urine_ph<6:
+    elif 4.5<=urine_ph<5:
         rec = "This is a danger zone, your body is too acidic, drastic dietary and lifestyle changes are advised. Please see a doctor."
-    elif 6<=urine_ph<6.5:
+    elif 5<=urine_ph<6:
         rec = 'Consider dietary and lifestyle changes to improve the pH of your body.'
-    elif 6.5<=urine_ph<6.7:
+    elif 6<=urine_ph<6.5:
         rec = "Consider slight dietary adjustments to bring your pH back up to where it should be."
-    elif 6.7<=urine_ph<7.25:
+    elif 6.5<=urine_ph<7.25:
         rec = 'Congratulations! Keep up the good work by maintaining an alkalising lifestyle.'
     elif 7.25<=urine_ph<8:
         rec = "WHile not uncommon, this is not healthy."
@@ -237,8 +238,61 @@ def drink_water_recommendation(time_list, ph_list, water_list):
         last_water += timedelta(hours=3)
         last_water = last_water.time()
         rehydrate_time = [last_water]
+        rec_time = rehydrate_time[0].strftime('%I:%M %p')
+        rec =f"It is advised that you drink water and rehydrate before {rec_time}."
+    elif rehydrate_time[0]==last_water and len(rehydrate_time)==1:
+        rec_time = last_water.strftime('%I:%M %p')
+        rec = f"You did not drink enough water the last time drank water (at {rec_time}), it is advised you drink more water immediately."
+    else:
+        rec_time = rehydrate_time[0].strftime('%I:%M %p')
+        rec =f"It is advised that you drink water and rehydrate before {rec_time}."
+
+    return rec 
+
+
+def extreme_case_based_recommendation(time_list, ph_list):
+    rec_time_list = []
+    
+    for i in range(len(time_list)):
+        time = time_list[i]
+        ph = ph_list[i]
         
-    return rehydrate_time
+        if ph<=4.6 or ph>=7.9:
+            rec_time_list.append(time)
+    
+    rec = []
+    for time in rec_time_list:
+        if dt.time(6,0)<=time<dt.time(8,0):
+            rec.append('early-morning')
+        elif dt.time(8,0)<=time<dt.time(10,0):
+            rec.append('mid-morning')
+        elif dt.time(10,0)<=time<dt.time(12,0):
+            rec.append('late-morning')
+        elif dt.time(12,0)<=time<dt.time(14,0):
+            rec.append('early-afternoon')
+        elif dt.time(14,0)<=time<dt.time(16,0):
+            rec.append('mid-afternoon')
+        elif dt.time(16,0)<=time<dt.time(18,0):
+            rec.append('late-afternoon')
+        elif dt.time(18,0)<=time<dt.time(21,0):
+            rec.append('evening')
+        elif dt.time(21,0)<=time<=dt.time(23,59):
+            rec.append('night')
+        elif dt.time(0,0)<=time<dt.time(3,0):
+            rec.append('late-night')
+        elif dt.time(3,0)<=time<dt.time(6,0):
+            rec.append('toward-morning')
+        else:
+            pass
+    
+    rec = list(set(rec))
+
+    if len(rec)==0:
+        return 'Good job drinking water throughout the day!'
+    elif len(rec)==1:
+        return f"""Your urine pH dropped below healthy levels during {rec[0]}, make sure to consciously drink water during {rec[0]}."""
+    else:
+        return f"""Your urine pH dropped below healthy levels during {", ".join(rec[:-1]) + ' and ' + rec[-1]}, make sure to consciously drink water during {", ".join(rec[:-1]) + ' and ' + rec[-1]}."""
 
 
 def ph_chart(urine_ph):
